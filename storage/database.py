@@ -108,6 +108,9 @@ def upsert_document(conn, source_id: int, d: dict) -> tuple[int, str]:
         conn.commit()
         return doc_id, "new"
     if existing["content_hash"] == chash:
+        if d.get("version_key") and existing["version_key"] != d.get("version_key"):
+            conn.execute("UPDATE documents SET version_key=? WHERE id=?", (d["version_key"], existing["id"]))
+            conn.commit()
         return existing["id"], "unchanged"
     conn.execute(
         """UPDATE documents SET title=?, url=?, published_at=?, doc_type=?, authority=?, version_key=?,

@@ -33,3 +33,11 @@ def test_delivery_dedupe(conn, source_id):
     db.record_delivery(conn, "2026-10-29", ["a@b"], [(doc_id, "high")], "mid")
     assert db.delivery_for(conn, "2026-10-29")["doc_count"] == 1
     assert db.delivery_for(conn, "2026-10-30") is None
+
+
+def test_unchanged_content_still_records_version_key(conn, source_id):
+    d = {"external_id": "r1", "title": "T", "url": "http://u", "content": "a", "version_key": None}
+    db.upsert_document(conn, source_id, d)
+    d["version_key"] = "guid-1"
+    assert db.upsert_document(conn, source_id, d)[1] == "unchanged"
+    assert db.find_document(conn, source_id, "r1")["version_key"] == "guid-1"
