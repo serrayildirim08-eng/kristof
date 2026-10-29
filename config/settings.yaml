@@ -1,0 +1,89 @@
+# Legal monitor settings. Secrets live in .env, never here.
+profile_version: 1            # bump when topics/keywords change -> AI cache invalidates
+timezone: Europe/Amsterdam
+schedule:
+  time: "07:30"               # daily run, local time
+collection:
+  window_hours: 48            # overlapping retrieval window
+  max_records_per_source: 300
+  max_content_chars: 60000    # stored per document
+jurisdictions: [NL]
+topics:
+  - name: Dutch rental law
+    key: rental
+    keywords:
+      - huur
+      - huurder
+      - verhuurder
+      - huurovereenkomst
+      - huurprijs
+      - huurverhoging
+      - huurbescherming
+      - huurcommissie
+      - woningwaardering
+      - puntenstelsel
+      - servicekosten
+      - woonruimte
+      - bedrijfsruimte
+      - "wet betaalbare huur"
+      - "goed verhuurderschap"
+      - huurtoeslag
+  - name: Dutch corporate law
+    key: corporate
+    keywords:
+      - vennootschap
+      - "besloten vennootschap"
+      - "naamloze vennootschap"
+      - aandeelhouder
+      - aandelen
+      - bestuurder
+      - commissaris
+      - "raad van commissarissen"
+      - "boek 2"
+      - ondernemingsrecht
+      - ondernemingskamer
+      - jaarrekening
+      - handelsregister
+      - "kamer van koophandel"
+      - ubo
+      - fusie
+      - splitsing
+      - enquêteprocedure
+      - bestuurdersaansprakelijkheid
+      - "bestuur en toezicht"
+      - "corporate governance"
+      - omzetting
+      - ontbinding
+exclude_keywords:
+  - "Caribisch Nederland"
+  - "BES-eilanden"
+# Staatscourant carries many notices that are not legal developments.
+exclude_doc_types:
+  - "overige overheidsinformatie"
+  - "deurwaardersexploot of betekening Belastingdienst"
+  - handelsregister
+exclude_title_patterns:
+  - "^Openbaar exploot"
+  - "^Ontbindingen Kamer van Koophandel"
+  - "^Grensoverschrijdende (omzetting|fusie|splitsing)"
+relevance:
+  title_weight: 3
+  body_cap: 12                # body hits counted at most this many times
+  relevant_min_score: 12      # >= -> relevant without LLM classification (title hit + strong body)
+  ambiguous_min_score: 4      # >= -> send excerpt to LLM; below -> rejected (1 generic body hit is noise)
+  excerpt_chars: 2500         # max excerpt sent to LLM
+llm:
+  provider: groq
+  base_url: https://api.groq.com/openai/v1
+  model: llama-3.1-8b-instant
+  max_output_tokens: 450
+  temperature: 0
+  daily_budget_usd: 0.50
+  # USD per 1M tokens. Verify against the provider's current price list.
+  price_input_per_m: 0.05
+  price_output_per_m: 0.08
+  chars_per_token: 3.5        # Dutch text estimate for budgeting
+email:
+  recipients: [serrayildirim08@gmail.com]
+  subject_prefix: "Daily Legal Intelligence"
+  send_empty_digest: false

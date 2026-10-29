@@ -1,0 +1,31 @@
+<!doctype html><html><head><meta charset="utf-8"><title>{{ subject }}</title></head>
+<body style="font-family:Georgia,serif;max-width:720px;margin:0 auto;padding:24px;color:#222;line-height:1.45">
+<h1 style="font-size:22px;margin:0 0 4px">DAILY LEGAL INTELLIGENCE</h1>
+<p style="margin:0 0 20px;color:#666">Date: {{ date }}</p>
+{% for level, label in [("high","HIGH PRIORITY"),("medium","MEDIUM PRIORITY"),("low","LOW PRIORITY")] %}
+{% set group = items | selectattr("priority","equalto",level) | list %}
+{% if group %}
+<h2 style="font-size:16px;letter-spacing:.06em;border-bottom:1px solid #ddd;padding-bottom:4px">{{ label }}</h2>
+{% for it in group %}
+<div style="margin:0 0 18px">
+  <p style="margin:0;font-weight:bold">{{ it.title }}</p>
+  <p style="margin:2px 0;color:#666;font-size:13px">{{ it.authority or "—" }} · {{ it.published_at or "date unknown" }} · {{ it.instrument | replace("_"," ") }}{% if it.effective_date %} · effective {{ it.effective_date }}{% endif %}</p>
+  <p style="margin:6px 0">{{ it.development }}</p>
+  {% if it.key_changes %}<ul style="margin:4px 0 6px 18px;padding:0">{% for c in it.key_changes %}<li>{{ c }}</li>{% endfor %}</ul>{% endif %}
+  {% if level != "low" and it.implications %}<p style="margin:4px 0"><em>Implications:</em> {{ it.implications }}</p>{% endif %}
+  {% if it.insufficient_text %}<p style="margin:4px 0;color:#a60">⚠ Text was insufficient for a reliable summary. Review the source.</p>{% endif %}
+  <p style="margin:4px 0"><a href="{{ it.url }}">{{ it.url }}</a></p>
+</div>
+{% endfor %}
+{% endif %}
+{% endfor %}
+{% if not items %}<p>No relevant developments found in this period.</p>{% endif %}
+<h2 style="font-size:16px;letter-spacing:.06em;border-bottom:1px solid #ddd;padding-bottom:4px">MONITORING STATUS</h2>
+<ul style="margin:6px 0 0 18px;padding:0">
+  <li>Sources checked: {{ status.sources_checked }}</li>
+  <li>Documents discovered: {{ status.docs_found }}</li>
+  <li>Relevant documents: {{ status.docs_relevant }}</li>
+  <li>Failed sources: {{ status.failed_sources | join(", ") if status.failed_sources else "none" }}</li>
+  <li>AI calls / est. cost: {{ status.ai_calls }} / ${{ "%.4f" | format(status.ai_cost_usd) }}{% if status.ai_budget_hit %} (daily budget reached, {{ status.pending_ai }} docs deferred){% endif %}</li>
+</ul>
+</body></html>

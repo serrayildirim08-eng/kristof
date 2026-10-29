@@ -1,0 +1,20 @@
+sources:
+  - name: KOOP Staatsblad + Staatscourant
+    url: https://repository.overheid.nl/sru
+    jurisdiction: NL
+    topics: [rental, corporate]
+    method: sru
+    enabled: true
+    params:
+      publications: [Staatsblad, Staatscourant]
+      # Optional CQL text pre-filter to cut volume server-side (Staatscourant is ~800 items/day).
+      text_terms: [huur, vennootschap, aandeelhouder, bestuurder, handelsregister, jaarrekening, verhuurder, ondernemingskamer]
+  - name: Internetconsultatie (new consultations)
+    url: https://www.internetconsultatie.nl/rss/feed
+    jurisdiction: NL
+    topics: [rental, corporate]
+    method: rss
+    enabled: true
+    params:
+      doc_type: proposal
+      authority: Rijksoverheid (internetconsultatie)
